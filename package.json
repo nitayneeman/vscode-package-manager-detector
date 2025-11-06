@@ -1,0 +1,91 @@
+{
+  "name": "package-manager-detector",
+  "displayName": "Package Manager Detector",
+  "description": "Detects and displays which package manager (npm, yarn, pnpm, bun) is used in your project",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "packageManagerDetector.refresh",
+        "title": "Refresh Package Manager Detection"
+      },
+      {
+        "command": "packageManagerDetector.install",
+        "title": "Install Dependencies"
+      },
+      {
+        "command": "packageManagerDetector.run",
+        "title": "Run Script"
+      }
+    ],
+    "colors": [
+      {
+        "id": "packageManagerDetector.npm",
+        "description": "Color for npm-related files",
+        "defaults": {
+          "dark": "#CB3837",
+          "light": "#CB3837",
+          "highContrast": "#CB3837"
+        }
+      },
+      {
+        "id": "packageManagerDetector.yarn",
+        "description": "Color for yarn-related files",
+        "defaults": {
+          "dark": "#2C8EBB",
+          "light": "#2C8EBB",
+          "highContrast": "#2C8EBB"
+        }
+      },
+      {
+        "id": "packageManagerDetector.pnpm",
+        "description": "Color for pnpm-related files",
+        "defaults": {
+          "dark": "#F9AD00",
+          "light": "#F9AD00",
+          "highContrast": "#F9AD00"
+        }
+      },
+      {
+        "id": "packageManagerDetector.bun",
+        "description": "Color for bun-related files",
+        "defaults": {
+          "dark": "#FBF0DF",
+          "light": "#F9F1E1",
+          "highContrast": "#FBF0DF"
+        }
+      }
+    ],
+    "configuration": {
+      "title": "Package Manager Detector",
+      "properties": {
+        "packageManagerDetector.fileDecorations.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the colored symbol badge on package.json"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  },
+  "packageManager": "yarn@3.6.4+sha512.e70835d4d6d62c07be76b3c1529cb640c7443f0fe434ef4b6478a5a399218cbaf1511b396b3c56eb03bc86424cff2320f6167ad2fde273aa0df6e60b7754029f"
+}
