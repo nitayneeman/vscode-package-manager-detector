@@ -2,6 +2,50 @@
 
 All notable changes to the "Package Manager Detector" extension will be documented in this file.
 
+## [0.3.1] - 2025-01-06
+
+### 🎨 Improved: Simplified Tooltip
+
+The tooltip has been streamlined to show only the most actionable and relevant information!
+
+#### Changed
+- **Package Manager Name Format**: Changed from UPPERCASE to Word Case (e.g., "YARN" → "Yarn", "NPM" → "Npm")
+- **Simplified Security Info**: Condensed to one line showing severity counts (e.g., "⚠️ 2 critical, 5 high vulnerabilities")
+- **Simplified Updates Info**: Condensed to one line showing update counts (e.g., "📦 3 major, 5 minor updates available")
+- **Simplified Dependencies**: Shows only total count instead of breakdown (e.g., "📊 23 dependencies")
+- **Fixed Click Message**: Corrected tooltip footer to always say "Click to open package.json"
+
+#### Removed
+- **Production/Dev Dependency Breakdown**: Removed to reduce clutter
+- **node_modules Package Count**: Removed as it's rarely actionable
+- **Lock File Modified Time**: Removed to simplify display
+
+#### New Format Example
+```
+🧶 Yarn v3.6.4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 packages/frontend
+🏗️  Monorepo: 5 workspaces
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  2 critical, 5 high vulnerabilities
+   💡 Run: yarn audit fix
+
+📦 3 major, 5 minor updates available
+   💡 Run: yarn upgrade-interactive
+
+📊 23 dependencies
+
+📜 Scripts (5):
+   • dev → vite
+   • build → vite build
+   • test → vitest
+   • lint → eslint .
+   • preview → vite preview
+
+💡 Click to open package.json
+```
+
 ## [0.3.0] - 2025-01-06
 
 ### 🎯 Simplified: Context-Aware Detection

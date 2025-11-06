@@ -215,9 +215,14 @@ async function updatePackageManager() {
       [PackageManager.UNKNOWN]: "❓",
     };
 
+    // Format package manager name as Word Case
+    const pmName =
+      currentPackageManager.type.charAt(0).toUpperCase() +
+      currentPackageManager.type.slice(1).toLowerCase();
+
     let tooltipText = `${
       pmIcons[currentPackageManager.type]
-    } ${currentPackageManager.type.toUpperCase()}${version}\n`;
+    } ${pmName}${version}\n`;
     tooltipText += `${"━".repeat(30)}\n`;
 
     // Show workspace context for monorepos
@@ -238,46 +243,49 @@ async function updatePackageManager() {
     const securityInfo = await getSecurityInfo(currentPackageManager.type);
     const outdatedInfo = await getOutdatedInfo(currentPackageManager.type);
 
+    // Show security issues if any
     if (securityInfo && securityInfo.hasIssues) {
-      tooltipText += `\n🔒 Security:\n`;
+      const parts = [];
       if (securityInfo.vulnerabilities.critical > 0) {
-        tooltipText += `   🔴 ${securityInfo.vulnerabilities.critical} critical\n`;
+        parts.push(
+          `${securityInfo.vulnerabilities.critical} critical`
+        );
       }
       if (securityInfo.vulnerabilities.high > 0) {
-        tooltipText += `   🟠 ${securityInfo.vulnerabilities.high} high\n`;
+        parts.push(`${securityInfo.vulnerabilities.high} high`);
       }
       if (securityInfo.vulnerabilities.moderate > 0) {
-        tooltipText += `   🟡 ${securityInfo.vulnerabilities.moderate} moderate\n`;
+        parts.push(`${securityInfo.vulnerabilities.moderate} moderate`);
       }
       if (securityInfo.vulnerabilities.low > 0) {
-        tooltipText += `   🟢 ${securityInfo.vulnerabilities.low} low\n`;
+        parts.push(`${securityInfo.vulnerabilities.low} low`);
       }
+      tooltipText += `\n⚠️  ${parts.join(", ")} vulnerabilit${
+        securityInfo.vulnerabilities.total === 1 ? "y" : "ies"
+      }\n`;
       tooltipText += `   💡 Run: ${currentPackageManager.installCommand.replace(
         " install",
         " audit fix"
       )}\n`;
     } else if (securityInfo && !securityInfo.hasIssues) {
-      tooltipText += `\n🔒 Security:\n`;
-      tooltipText += `   ✅ No vulnerabilities found\n`;
+      tooltipText += `\n✅ No vulnerabilities\n`;
     }
 
+    // Show updates if any
     if (outdatedInfo && outdatedInfo.hasUpdates) {
-      tooltipText += `\n📦 Updates Available:\n`;
+      const parts = [];
       if (outdatedInfo.packages.major > 0) {
-        tooltipText += `   🔴 ${outdatedInfo.packages.major} major update${
-          outdatedInfo.packages.major !== 1 ? "s" : ""
-        }\n`;
+        parts.push(`${outdatedInfo.packages.major} major`);
       }
       if (outdatedInfo.packages.minor > 0) {
-        tooltipText += `   🟡 ${outdatedInfo.packages.minor} minor update${
-          outdatedInfo.packages.minor !== 1 ? "s" : ""
-        }\n`;
+        parts.push(`${outdatedInfo.packages.minor} minor`);
       }
       if (outdatedInfo.packages.patch > 0) {
-        tooltipText += `   🟢 ${outdatedInfo.packages.patch} patch update${
-          outdatedInfo.packages.patch !== 1 ? "s" : ""
-        }\n`;
+        parts.push(`${outdatedInfo.packages.patch} patch`);
       }
+      tooltipText += `\n📦 ${parts.join(", ")} update${
+        outdatedInfo.packages.total === 1 ? "" : "s"
+      } available\n`;
       const updateCommand =
         currentPackageManager.type === PackageManager.YARN
           ? "yarn upgrade-interactive"
@@ -286,56 +294,23 @@ async function updatePackageManager() {
           : "npm update";
       tooltipText += `   💡 Run: ${updateCommand}\n`;
     } else if (outdatedInfo && !outdatedInfo.hasUpdates) {
-      tooltipText += `\n📦 Updates:\n`;
-      tooltipText += `   ✅ All packages up to date\n`;
+      tooltipText += `\n✅ All packages up to date\n`;
     }
 
-    // Dependencies statistics
-    const prodDeps = packageData?.dependencies
-      ? Object.keys(packageData.dependencies).length
-      : 0;
-    const devDeps = packageData?.devDependencies
-      ? Object.keys(packageData.devDependencies).length
-      : 0;
-    const totalDeps = prodDeps + devDeps;
+    // Dependencies count (simple total)
+    const totalDeps =
+      (packageData?.dependencies ? Object.keys(packageData.dependencies).length : 0) +
+      (packageData?.devDependencies ? Object.keys(packageData.devDependencies).length : 0);
 
     if (totalDeps > 0) {
-      tooltipText += `📊 Dependencies:\n`;
-      if (prodDeps > 0) {
-        tooltipText += `   Production: ${prodDeps} package${
-          prodDeps !== 1 ? "s" : ""
-        }\n`;
-      }
-      if (devDeps > 0) {
-        tooltipText += `   Development: ${devDeps} package${
-          devDeps !== 1 ? "s" : ""
-        }\n`;
-      }
-      tooltipText += `   Total: ${totalDeps} package${
-        totalDeps !== 1 ? "s" : ""
-      }\n`;
-    }
-
-    // node_modules info
-    if (nodeModulesStats) {
-      tooltipText += `\n📁 node_modules:\n`;
-      tooltipText += `   Packages: ${nodeModulesStats.count} (updated ${nodeModulesStats.lastModified})\n`;
-    }
-
-    // Lock file info
-    if (currentPackageManager.lockFile) {
-      tooltipText += `\n🔒 ${currentPackageManager.lockFile}`;
-      if (lockFileTime) {
-        tooltipText += ` (modified ${lockFileTime})`;
-      }
-      tooltipText += `\n`;
+      tooltipText += `\n📊 ${totalDeps} dependenc${totalDeps === 1 ? "y" : "ies"}\n`;
     }
 
     // Available scripts with commands
     if (packageData?.scripts) {
       const scripts = Object.entries(packageData.scripts);
       if (scripts.length > 0) {
-        tooltipText += `\n📜 Available Scripts (${scripts.length}):\n`;
+        tooltipText += `\n📜 Scripts (${scripts.length}):\n`;
         scripts.forEach(([name, command]) => {
           // Truncate long commands
           const truncatedCommand =
@@ -344,12 +319,10 @@ async function updatePackageManager() {
         });
       }
     } else {
-      tooltipText += `\n⚠️  No scripts defined in package.json\n`;
+      tooltipText += `\n⚠️  No scripts defined\n`;
     }
 
-    tooltipText += `\n💡 Click to ${
-      isMonorepo ? "select workspace" : "refresh detection"
-    }`;
+    tooltipText += `\n💡 Click to open package.json`;
 
     statusBarItem.tooltip = tooltipText;
 

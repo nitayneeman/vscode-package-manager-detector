@@ -1,23 +1,22 @@
 # Tooltip Examples
 
-Visual examples of the enhanced tooltip for each package manager.
+Visual examples of the simplified tooltip for each package manager.
 
-## 📦 NPM Example
+## 📦 Npm Example (with issues)
 
 ```
-📦 NPM v9.8.1
+📦 Npm v9.8.1
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 Dependencies:
-   Production: 15 packages
-   Development: 8 packages
-   Total: 23 packages
 
-📁 node_modules:
-   Packages: 245 (updated 2h ago)
+⚠️  2 critical, 5 high vulnerabilities
+   💡 Run: npm audit fix
 
-🔒 package-lock.json (modified 3h ago)
+📦 3 major, 5 minor updates available
+   💡 Run: npm update
 
-📜 Available Scripts (7):
+📊 23 dependencies
+
+📜 Scripts (7):
    • dev → vite
    • build → tsc && vite build
    • test → vitest
@@ -26,50 +25,45 @@ Visual examples of the enhanced tooltip for each package manager.
    • preview → vite preview
    • type-check → tsc --noEmit
 
-💡 Click to refresh detection
+💡 Click to open package.json
 ```
 
-## 🧶 Yarn Example
+## 🧶 Yarn Example (healthy)
 
 ```
-🧶 YARN v3.6.4
+🧶 Yarn v3.6.4
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 Dependencies:
-   Production: 12 packages
-   Development: 6 packages
-   Total: 18 packages
 
-📁 node_modules:
-   Packages: 198 (updated 1d ago)
+✅ No vulnerabilities
 
-🔒 yarn.lock (modified 5h ago)
+✅ All packages up to date
 
-📜 Available Scripts (5):
+📊 18 dependencies
+
+📜 Scripts (5):
    • start → react-scripts start
    • build → react-scripts build
    • test → react-scripts test
    • eject → react-scripts eject
    • analyze → source-map-explorer 'build/st...
 
-💡 Click to refresh detection
+💡 Click to open package.json
 ```
 
-## 📦 PNPM Example
+## 📦 Pnpm Example (with updates only)
 
 ```
-📦 PNPM v8.10.0
+📦 Pnpm v8.10.0
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 Dependencies:
-   Production: 20 packages
-   Development: 12 packages
-   Total: 32 packages
 
-📁 node_modules:
-   Packages: 310 (updated just now)
+✅ No vulnerabilities
 
-🔒 pnpm-lock.yaml (modified just now)
+📦 2 minor, 8 patch updates available
+   💡 Run: pnpm update
 
-📜 Available Scripts (6):
+📊 32 dependencies
+
+📜 Scripts (6):
    • dev → next dev
    • build → next build
    • start → next start
@@ -77,84 +71,105 @@ Visual examples of the enhanced tooltip for each package manager.
    • test → jest
    • test:watch → jest --watch
 
-💡 Click to refresh detection
+💡 Click to open package.json
 ```
 
 ## 🥟 Bun Example
 
 ```
-🥟 BUN v1.0.11
+🥟 Bun v1.0.11
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 Dependencies:
-   Production: 8 packages
-   Development: 4 packages
-   Total: 12 packages
 
-📁 node_modules:
-   Packages: 156 (updated 12h ago)
+📊 12 dependencies
 
-🔒 bun.lockb (modified 12h ago)
-
-📜 Available Scripts (4):
+📜 Scripts (4):
    • dev → bun run --hot src/index.ts
    • build → bun build src/index.ts --outdir...
    • start → bun run src/index.ts
    • test → bun test
 
-💡 Click to refresh detection
+💡 Click to open package.json
+```
+
+## 🏗️ Monorepo Example (Yarn)
+
+```
+🧶 Yarn v3.6.4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 packages/frontend
+🏗️  Monorepo: 5 workspaces
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  1 high, 3 moderate vulnerabilities
+   💡 Run: yarn audit fix
+
+📦 1 major, 2 minor updates available
+   💡 Run: yarn upgrade-interactive
+
+📊 15 dependencies
+
+📜 Scripts (5):
+   • dev → vite
+   • build → vite build
+   • test → vitest
+   • lint → eslint .
+   • preview → vite preview
+
+💡 Click to open package.json
 ```
 
 ## ⚠️ No Dependencies Example
 
 ```
-📦 NPM
+📦 Npm
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔒 package-lock.json (modified 1h ago)
 
-📜 Available Scripts (2):
+📜 Scripts (2):
    • start → node index.js
    • dev → nodemon index.js
 
-💡 Click to refresh detection
+💡 Click to open package.json
 ```
 
 ## ❌ No Scripts Example
 
 ```
-🧶 YARN v1.22.19
+🧶 Yarn v1.22.19
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 Dependencies:
-   Production: 5 packages
-   Total: 5 packages
 
-📁 node_modules:
-   Packages: 42 (updated 3d ago)
+📊 5 dependencies
 
-🔒 yarn.lock (modified 3d ago)
+⚠️  No scripts defined
 
-⚠️  No scripts defined in package.json
-
-💡 Click to refresh detection
+💡 Click to open package.json
 ```
 
 ## Features Shown
 
-✅ **Package Manager Name & Version** - From packageManager field in package.json
-✅ **Dependency Statistics** - Counts production, dev, and total packages
-✅ **node_modules Info** - Package count and last update time
-✅ **Lock File Status** - Name and last modified time
+✅ **Package Manager Name & Version** (Word Case) - From packageManager field in package.json
+✅ **Security Vulnerabilities** - Condensed one-line summary with actionable fix command
+✅ **Outdated Packages** - Condensed one-line summary with update command
+✅ **Total Dependencies** - Simple count of all dependencies
 ✅ **Complete Script List** - All scripts with their actual commands
 ✅ **Smart Truncation** - Long commands are truncated at 40 characters
-✅ **Time Formatting** - Relative time (just now, 2h ago, 3d ago)
+✅ **Monorepo Context** - Shows current workspace and total workspace count
 ✅ **Dynamic Content** - Updates automatically when you modify package.json
 
 ## What's Calculated
 
-| Data Point         | How It's Calculated                                        |
-| ------------------ | ---------------------------------------------------------- |
-| Dependencies       | Counts keys in `dependencies` and `devDependencies`        |
-| node_modules count | Counts directories in node_modules (excludes .bin, .cache) |
-| Last updated       | Based on node_modules directory modification time          |
-| Lock file modified | Based on lock file modification time                       |
-| Scripts            | All entries from `scripts` section in package.json         |
-| Version            | Extracted from `packageManager` field using regex          |
+| Data Point       | How It's Calculated                                              |
+| ---------------- | ---------------------------------------------------------------- |
+| Dependencies     | Total count from `dependencies` + `devDependencies`              |
+| Security         | Runs `npm/yarn/pnpm audit --json` (cached for 5 min)             |
+| Updates          | Runs `npm/yarn/pnpm outdated --json` (cached for 5 min)          |
+| Scripts          | All entries from `scripts` section in package.json               |
+| Version          | Extracted from `packageManager` field using regex                |
+| Workspace Context| Walks up directory tree to find nearest package.json (monorepos) |
+
+## What Was Removed (v0.3.1)
+
+❌ Production/Dev dependency breakdown
+❌ node_modules package count
+❌ Lock file modified time
+
+These were removed to focus on actionable information and reduce tooltip clutter.
