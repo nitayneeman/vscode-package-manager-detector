@@ -247,9 +247,7 @@ async function updatePackageManager() {
     if (securityInfo && securityInfo.hasIssues) {
       const parts = [];
       if (securityInfo.vulnerabilities.critical > 0) {
-        parts.push(
-          `${securityInfo.vulnerabilities.critical} critical`
-        );
+        parts.push(`${securityInfo.vulnerabilities.critical} critical`);
       }
       if (securityInfo.vulnerabilities.high > 0) {
         parts.push(`${securityInfo.vulnerabilities.high} high`);
@@ -299,11 +297,17 @@ async function updatePackageManager() {
 
     // Dependencies count (simple total)
     const totalDeps =
-      (packageData?.dependencies ? Object.keys(packageData.dependencies).length : 0) +
-      (packageData?.devDependencies ? Object.keys(packageData.devDependencies).length : 0);
+      (packageData?.dependencies
+        ? Object.keys(packageData.dependencies).length
+        : 0) +
+      (packageData?.devDependencies
+        ? Object.keys(packageData.devDependencies).length
+        : 0);
 
     if (totalDeps > 0) {
-      tooltipText += `\n📊 ${totalDeps} dependenc${totalDeps === 1 ? "y" : "ies"}\n`;
+      tooltipText += `\n📊 ${totalDeps} dependenc${
+        totalDeps === 1 ? "y" : "ies"
+      }\n`;
     }
 
     // Available scripts with commands
