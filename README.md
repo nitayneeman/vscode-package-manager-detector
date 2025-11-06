@@ -5,6 +5,12 @@ A VS Code extension that automatically detects and displays which package manage
 ## Features
 
 - **Automatic Detection**: Identifies package manager based on lock files
+- **🏗️ Monorepo Support** (NEW!):
+  - Auto-detects npm/yarn/pnpm workspaces, Lerna, and Turborepo
+  - Context-aware detection based on active file
+  - Manual workspace selector with pin functionality
+  - Shows workspace-specific stats and scripts
+  - [Learn more](./MONOREPO_SUPPORT.md)
 - **Color-Coded Status Bar**: Shows icon and package manager name with colored text
   - 🔴 **npm**: Icon + name in red (#CB3837)
   - 🔵 **yarn**: Icon + name in blue (#2C8EBB)
@@ -15,10 +21,16 @@ A VS Code extension that automatically detects and displays which package manage
   - ◉ Blue circled dot for yarn
   - ▣ Yellow square grid for pnpm
   - ● Cream circle for bun
+- **Rich Statistics Tooltip**:
+  - Dependencies count (production/dev/total)
+  - node_modules stats with last updated time
+  - Complete list of all scripts with their commands
+  - Workspace context for monorepos
 - **Priority Detection**: bun → pnpm → yarn → npm
 - **Quick Commands**: 
   - Install dependencies with one click
   - Run package.json scripts from a quick pick menu
+  - Select workspace package (for monorepos)
   - Refresh detection manually
 - **Auto-Update**: Watches for changes to lock files and updates automatically
 

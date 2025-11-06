@@ -104,7 +104,7 @@ Visual examples of the enhanced tooltip for each package manager.
 💡 Click to refresh detection
 ```
 
-## ⚠️  No Dependencies Example
+## ⚠️ No Dependencies Example
 
 ```
 📦 NPM
@@ -150,12 +150,11 @@ Visual examples of the enhanced tooltip for each package manager.
 
 ## What's Calculated
 
-| Data Point | How It's Calculated |
-|-----------|-------------------|
-| Dependencies | Counts keys in `dependencies` and `devDependencies` |
+| Data Point         | How It's Calculated                                        |
+| ------------------ | ---------------------------------------------------------- |
+| Dependencies       | Counts keys in `dependencies` and `devDependencies`        |
 | node_modules count | Counts directories in node_modules (excludes .bin, .cache) |
-| Last updated | Based on node_modules directory modification time |
-| Lock file modified | Based on lock file modification time |
-| Scripts | All entries from `scripts` section in package.json |
-| Version | Extracted from `packageManager` field using regex |
-
+| Last updated       | Based on node_modules directory modification time          |
+| Lock file modified | Based on lock file modification time                       |
+| Scripts            | All entries from `scripts` section in package.json         |
+| Version            | Extracted from `packageManager` field using regex          |
