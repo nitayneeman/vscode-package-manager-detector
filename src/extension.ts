@@ -11,7 +11,6 @@ let statusBarItem: vscode.StatusBarItem;
 let currentPackageManager: PackageManagerInfo | undefined;
 let fileDecorationProvider: PackageManagerFileDecorationProvider;
 let currentWorkspaceContext: string | undefined; // Path to current package.json directory
-let pinnedWorkspace: string | undefined; // User-selected workspace (overrides auto-detection)
 let isMonorepo: boolean = false;
 let workspacePackages: string[] = []; // List of workspace package paths
 
@@ -45,76 +44,29 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "packageManagerDetector.selectWorkspace",
+      "packageManagerDetector.openPackageJson",
       async () => {
-        if (!isMonorepo || workspacePackages.length <= 1) {
-          vscode.window.showInformationMessage(
-            "No monorepo detected or only one package found"
-          );
+        if (!currentWorkspaceContext) {
+          vscode.window.showWarningMessage("No package.json found in context");
           return;
         }
 
-        const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-        if (!workspaceRoot) {
-          return;
-        }
-
-        // Build quick pick items
-        const items: vscode.QuickPickItem[] = workspacePackages.map(
-          (pkgPath) => {
-            const displayName = getWorkspaceDisplayName(pkgPath, workspaceRoot);
-            const isCurrent = pkgPath === currentWorkspaceContext;
-            const isPinned = pkgPath === pinnedWorkspace;
-
-            let description = "";
-            if (isCurrent && isPinned) {
-              description = "📍 Pinned & Active";
-            } else if (isPinned) {
-              description = "📍 Pinned";
-            } else if (isCurrent) {
-              description = "✓ Active";
-            }
-
-            return {
-              label: `${
-                pkgPath === workspaceRoot ? "📦" : "📁"
-              } ${displayName}`,
-              description,
-              detail: pkgPath,
-            };
-          }
+        const packageJsonPath = path.join(
+          currentWorkspaceContext,
+          "package.json"
         );
+        const packageJsonUri = vscode.Uri.file(packageJsonPath);
 
-        // Add option to clear pin
-        if (pinnedWorkspace) {
-          items.unshift({
-            label: "$(pin) Clear Pin (Auto-detect)",
-            description: "Let extension detect workspace from active file",
-            detail: "clear-pin",
-          });
-        }
-
-        const selected = await vscode.window.showQuickPick(items, {
-          placeHolder: "Select workspace package",
-          matchOnDescription: true,
-          matchOnDetail: true,
-        });
-
-        if (!selected) {
-          return;
-        }
-
-        if (selected.detail === "clear-pin") {
-          pinnedWorkspace = undefined;
-          vscode.window.showInformationMessage(
-            "Workspace pin cleared - using auto-detection"
+        try {
+          const document = await vscode.workspace.openTextDocument(
+            packageJsonUri
           );
-        } else {
-          pinnedWorkspace = selected.detail;
-          vscode.window.showInformationMessage(`Pinned to: ${selected.label}`);
+          await vscode.window.showTextDocument(document);
+        } catch (error) {
+          vscode.window.showErrorMessage(
+            `Could not open package.json: ${error}`
+          );
         }
-
-        await updateWorkspaceContext();
       }
     )
   );
@@ -176,8 +128,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Watch for active editor changes (for context-aware detection)
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(async (editor) => {
-      if (editor && !pinnedWorkspace) {
-        // Only auto-update if not pinned
+      if (editor) {
         await updateWorkspaceContext(editor.document.uri.fsPath);
       }
     })
@@ -276,15 +227,67 @@ async function updatePackageManager() {
         currentWorkspaceContext,
         workspaceRoot
       );
-      tooltipText += `📍 ${contextName}`;
-      if (pinnedWorkspace) {
-        tooltipText += ` (pinned)`;
-      }
-      tooltipText += `\n`;
+      tooltipText += `📍 ${contextName}\n`;
       tooltipText += `🏗️  Monorepo: ${workspacePackages.length} workspace${
         workspacePackages.length !== 1 ? "s" : ""
       }\n`;
       tooltipText += `${"━".repeat(30)}\n`;
+    }
+
+    // Security and Updates info (fetch in background)
+    const securityInfo = await getSecurityInfo(currentPackageManager.type);
+    const outdatedInfo = await getOutdatedInfo(currentPackageManager.type);
+
+    if (securityInfo && securityInfo.hasIssues) {
+      tooltipText += `\n🔒 Security:\n`;
+      if (securityInfo.vulnerabilities.critical > 0) {
+        tooltipText += `   🔴 ${securityInfo.vulnerabilities.critical} critical\n`;
+      }
+      if (securityInfo.vulnerabilities.high > 0) {
+        tooltipText += `   🟠 ${securityInfo.vulnerabilities.high} high\n`;
+      }
+      if (securityInfo.vulnerabilities.moderate > 0) {
+        tooltipText += `   🟡 ${securityInfo.vulnerabilities.moderate} moderate\n`;
+      }
+      if (securityInfo.vulnerabilities.low > 0) {
+        tooltipText += `   🟢 ${securityInfo.vulnerabilities.low} low\n`;
+      }
+      tooltipText += `   💡 Run: ${currentPackageManager.installCommand.replace(
+        " install",
+        " audit fix"
+      )}\n`;
+    } else if (securityInfo && !securityInfo.hasIssues) {
+      tooltipText += `\n🔒 Security:\n`;
+      tooltipText += `   ✅ No vulnerabilities found\n`;
+    }
+
+    if (outdatedInfo && outdatedInfo.hasUpdates) {
+      tooltipText += `\n📦 Updates Available:\n`;
+      if (outdatedInfo.packages.major > 0) {
+        tooltipText += `   🔴 ${outdatedInfo.packages.major} major update${
+          outdatedInfo.packages.major !== 1 ? "s" : ""
+        }\n`;
+      }
+      if (outdatedInfo.packages.minor > 0) {
+        tooltipText += `   🟡 ${outdatedInfo.packages.minor} minor update${
+          outdatedInfo.packages.minor !== 1 ? "s" : ""
+        }\n`;
+      }
+      if (outdatedInfo.packages.patch > 0) {
+        tooltipText += `   🟢 ${outdatedInfo.packages.patch} patch update${
+          outdatedInfo.packages.patch !== 1 ? "s" : ""
+        }\n`;
+      }
+      const updateCommand =
+        currentPackageManager.type === PackageManager.YARN
+          ? "yarn upgrade-interactive"
+          : currentPackageManager.type === PackageManager.PNPM
+          ? "pnpm update"
+          : "npm update";
+      tooltipText += `   💡 Run: ${updateCommand}\n`;
+    } else if (outdatedInfo && !outdatedInfo.hasUpdates) {
+      tooltipText += `\n📦 Updates:\n`;
+      tooltipText += `   ✅ All packages up to date\n`;
     }
 
     // Dependencies statistics
@@ -369,9 +372,7 @@ async function updatePackageManager() {
   }
 
   // Set command based on monorepo detection
-  statusBarItem.command = isMonorepo
-    ? "packageManagerDetector.selectWorkspace"
-    : "packageManagerDetector.refresh";
+  statusBarItem.command = "packageManagerDetector.openPackageJson";
 
   statusBarItem.show();
 }
@@ -383,6 +384,38 @@ interface PackageJsonData {
   packageManager?: string;
   workspaces?: string[] | { packages?: string[] };
 }
+
+interface SecurityInfo {
+  vulnerabilities: {
+    critical: number;
+    high: number;
+    moderate: number;
+    low: number;
+    total: number;
+  };
+  hasIssues: boolean;
+}
+
+interface OutdatedInfo {
+  packages: {
+    major: number;
+    minor: number;
+    patch: number;
+    total: number;
+  };
+  hasUpdates: boolean;
+}
+
+// Cache for security and outdated checks (to avoid running too frequently)
+let securityCache: { timestamp: number; data: SecurityInfo | null } = {
+  timestamp: 0,
+  data: null,
+};
+let outdatedCache: { timestamp: number; data: OutdatedInfo | null } = {
+  timestamp: 0,
+  data: null,
+};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 async function getPackageJsonData(): Promise<PackageJsonData | null> {
   if (!currentWorkspaceContext) {
@@ -567,6 +600,209 @@ async function getPackageJsonDataForPath(
   }
 }
 
+async function getSecurityInfo(
+  packageManager: PackageManager
+): Promise<SecurityInfo | null> {
+  // Check cache first
+  const now = Date.now();
+  if (securityCache.data && now - securityCache.timestamp < CACHE_DURATION) {
+    return securityCache.data;
+  }
+
+  if (!currentWorkspaceContext) {
+    return null;
+  }
+
+  try {
+    const { exec } = require("child_process");
+    const { promisify } = require("util");
+    const execPromise = promisify(exec);
+
+    let command = "";
+    switch (packageManager) {
+      case PackageManager.NPM:
+        command = "npm audit --json";
+        break;
+      case PackageManager.YARN:
+        command = "yarn audit --json";
+        break;
+      case PackageManager.PNPM:
+        command = "pnpm audit --json";
+        break;
+      case PackageManager.BUN:
+        // Bun doesn't have audit yet, skip
+        return null;
+      default:
+        return null;
+    }
+
+    const { stdout } = await execPromise(command, {
+      cwd: currentWorkspaceContext,
+      timeout: 10000, // 10 second timeout
+    });
+
+    const auditData = JSON.parse(stdout);
+
+    let vulnerabilities = {
+      critical: 0,
+      high: 0,
+      moderate: 0,
+      low: 0,
+      total: 0,
+    };
+
+    // Parse based on package manager
+    if (
+      packageManager === PackageManager.NPM ||
+      packageManager === PackageManager.PNPM
+    ) {
+      if (auditData.metadata?.vulnerabilities) {
+        vulnerabilities = {
+          critical: auditData.metadata.vulnerabilities.critical || 0,
+          high: auditData.metadata.vulnerabilities.high || 0,
+          moderate: auditData.metadata.vulnerabilities.moderate || 0,
+          low: auditData.metadata.vulnerabilities.low || 0,
+          total: auditData.metadata.vulnerabilities.total || 0,
+        };
+      }
+    } else if (packageManager === PackageManager.YARN) {
+      // Yarn has different format
+      const advisories = auditData.advisories || {};
+      Object.values(advisories).forEach((advisory: any) => {
+        const severity = advisory.severity;
+        if (severity === "critical") {
+          vulnerabilities.critical++;
+        } else if (severity === "high") {
+          vulnerabilities.high++;
+        } else if (severity === "moderate") {
+          vulnerabilities.moderate++;
+        } else if (severity === "low") {
+          vulnerabilities.low++;
+        }
+      });
+      vulnerabilities.total =
+        vulnerabilities.critical +
+        vulnerabilities.high +
+        vulnerabilities.moderate +
+        vulnerabilities.low;
+    }
+
+    const securityInfo: SecurityInfo = {
+      vulnerabilities,
+      hasIssues: vulnerabilities.total > 0,
+    };
+
+    // Cache the result
+    securityCache = {
+      timestamp: now,
+      data: securityInfo,
+    };
+
+    return securityInfo;
+  } catch (error) {
+    // Audit might fail if no node_modules or network issues, that's okay
+    return null;
+  }
+}
+
+async function getOutdatedInfo(
+  packageManager: PackageManager
+): Promise<OutdatedInfo | null> {
+  // Check cache first
+  const now = Date.now();
+  if (outdatedCache.data && now - outdatedCache.timestamp < CACHE_DURATION) {
+    return outdatedCache.data;
+  }
+
+  if (!currentWorkspaceContext) {
+    return null;
+  }
+
+  try {
+    const { exec } = require("child_process");
+    const { promisify } = require("util");
+    const execPromise = promisify(exec);
+
+    let command = "";
+    switch (packageManager) {
+      case PackageManager.NPM:
+        command = "npm outdated --json";
+        break;
+      case PackageManager.YARN:
+        command = "yarn outdated --json";
+        break;
+      case PackageManager.PNPM:
+        command = "pnpm outdated --json";
+        break;
+      case PackageManager.BUN:
+        // Bun doesn't have outdated command yet
+        return null;
+      default:
+        return null;
+    }
+
+    const { stdout } = await execPromise(command, {
+      cwd: currentWorkspaceContext,
+      timeout: 15000, // 15 second timeout
+    });
+
+    if (!stdout || stdout.trim() === "") {
+      // No outdated packages
+      const outdatedInfo: OutdatedInfo = {
+        packages: { major: 0, minor: 0, patch: 0, total: 0 },
+        hasUpdates: false,
+      };
+      outdatedCache = { timestamp: now, data: outdatedInfo };
+      return outdatedInfo;
+    }
+
+    const outdatedData = JSON.parse(stdout);
+
+    let major = 0;
+    let minor = 0;
+    let patch = 0;
+
+    // Parse outdated packages
+    for (const [pkgName, info] of Object.entries(outdatedData)) {
+      const pkg = info as any;
+      const current = pkg.current || "";
+      const wanted = pkg.wanted || "";
+      const latest = pkg.latest || "";
+
+      // Determine update type
+      if (current && latest) {
+        const currentParts = current.replace(/[^0-9.]/g, "").split(".");
+        const latestParts = latest.replace(/[^0-9.]/g, "").split(".");
+
+        if (currentParts[0] !== latestParts[0]) {
+          major++;
+        } else if (currentParts[1] !== latestParts[1]) {
+          minor++;
+        } else if (currentParts[2] !== latestParts[2]) {
+          patch++;
+        }
+      }
+    }
+
+    const total = major + minor + patch;
+    const outdatedInfo: OutdatedInfo = {
+      packages: { major, minor, patch, total },
+      hasUpdates: total > 0,
+    };
+
+    // Cache the result
+    outdatedCache = {
+      timestamp: now,
+      data: outdatedInfo,
+    };
+
+    return outdatedInfo;
+  } catch (error) {
+    // outdated command might fail, that's okay
+    return null;
+  }
+}
+
 async function findClosestPackageJson(
   filePath: string
 ): Promise<string | undefined> {
@@ -627,10 +863,8 @@ async function updateWorkspaceContext(filePath?: string) {
     workspacePackages = [workspaceRoot];
   }
 
-  // Determine context: pinned > active file context > root
-  if (pinnedWorkspace) {
-    currentWorkspaceContext = pinnedWorkspace;
-  } else if (filePath) {
+  // Determine context: active file context > root
+  if (filePath) {
     currentWorkspaceContext = await findClosestPackageJson(filePath);
   } else {
     const activeEditor = vscode.window.activeTextEditor;

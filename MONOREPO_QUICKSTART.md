@@ -1,16 +1,17 @@
 # Monorepo Quick Start
 
-## ✨ What's New in v0.1.0
+## ✨ Monorepo Support
 
-Your extension now has **full monorepo support**! It automatically detects workspace packages and shows context-aware information.
+Your extension has **full monorepo support**! It automatically detects workspace packages and shows context-aware information.
 
 ## 🚀 Quick Demo
 
-### Automatic Mode (No setup required!)
+### How It Works (Automatic!)
 
 1. **Open any file** in your monorepo
 2. **Look at the status bar** - it shows the package you're editing
 3. **Hover over status bar** - see stats for that specific package
+4. **Click status bar** - opens the relevant package.json
 
 **Example:**
 ```
@@ -22,15 +23,11 @@ Tooltip shows:
   🏗️  Monorepo: 5 workspaces
   📊 Dependencies for frontend package
   📜 Scripts from frontend's package.json
+
+Click it: Opens packages/frontend/package.json
 ```
 
-### Manual Mode (Pin a workspace)
-
-1. Press **Cmd+Shift+P** (Mac) or **Ctrl+Shift+P** (Windows/Linux)
-2. Type: **"Select Workspace"**
-3. Choose: `Select Workspace Package (Monorepo)`
-4. **Pick a workspace** from the list
-5. **Done!** That workspace stays active until you clear the pin
+The extension automatically updates as you navigate between different packages!
 
 ## 🎯 Supported Monorepo Types
 
@@ -89,26 +86,21 @@ packages:
 
 | Command | Description |
 |---------|-------------|
+| `Open package.json` | Opens the relevant package.json for your context |
 | `Refresh Package Manager Detection` | Re-scan workspaces |
-| `Select Workspace Package (Monorepo)` | Pin a specific workspace |
 | `Install Dependencies` | Run install in current context |
 | `Run Script` | Run scripts from current package.json |
 
 ## 💡 Tips
 
-### Tip 1: Automatic is Best
-Most of the time, just let it auto-detect. It works great!
+### Tip 1: It Just Works!
+The extension automatically detects which package you're working in based on your active file. No manual setup required!
 
-### Tip 2: Pin When Needed
-Pin a workspace when:
-- Working on one package for a while
-- Running commands specific to one package
-- Don't want context to switch as you browse files
+### Tip 2: Quick Access
+Click the status bar to quickly open the package.json for your current context - great for reviewing or editing dependencies and scripts.
 
-### Tip 3: Clear Pin Easily
-To go back to automatic mode:
-- Run `Select Workspace Package`
-- Choose **"Clear Pin (Auto-detect)"** at the top
+### Tip 3: Seamless Navigation
+Switch between packages by simply opening files in different workspace directories. The extension updates instantly!
 
 ## 🔍 Troubleshooting
 
@@ -117,12 +109,9 @@ To go back to automatic mode:
 - Run `Refresh Package Manager Detection`
 
 **Q: Shows wrong workspace**
-- You might have it pinned. Run `Select Workspace Package` and clear the pin
-- Or manually select the correct workspace
-
-**Q: I don't see the workspace selector command**
-- Only appears when a monorepo is detected
-- Try refreshing detection
+- The extension detects based on your active file location
+- Try opening a file from the correct workspace package
+- Run `Refresh Package Manager Detection` if needed
 
 ## 📚 Learn More
 

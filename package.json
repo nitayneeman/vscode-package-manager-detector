@@ -2,7 +2,7 @@
   "name": "package-manager-detector",
   "displayName": "Package Manager Detector",
   "description": "Detects and displays which package manager (npm, yarn, pnpm, bun) is used in your project",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "publisher": "nitayneeman",
   "repository": {
     "type": "git",
@@ -25,8 +25,8 @@
         "title": "Refresh Package Manager Detection"
       },
       {
-        "command": "packageManagerDetector.selectWorkspace",
-        "title": "Select Workspace Package (Monorepo)"
+        "command": "packageManagerDetector.openPackageJson",
+        "title": "Open package.json"
       },
       {
         "command": "packageManagerDetector.install",

@@ -5,11 +5,11 @@ A VS Code extension that automatically detects and displays which package manage
 ## Features
 
 - **Automatic Detection**: Identifies package manager based on lock files
-- **🏗️ Monorepo Support** (NEW!):
+- **🏗️ Monorepo Support**:
   - Auto-detects npm/yarn/pnpm workspaces, Lerna, and Turborepo
-  - Context-aware detection based on active file
-  - Manual workspace selector with pin functionality
+  - Context-aware detection based on active file location
   - Shows workspace-specific stats and scripts
+  - Automatically switches context as you navigate
   - [Learn more](./MONOREPO_SUPPORT.md)
 - **Color-Coded Status Bar**: Shows icon and package manager name with colored text
   - 🔴 **npm**: Icon + name in red (#CB3837)
@@ -21,16 +21,22 @@ A VS Code extension that automatically detects and displays which package manage
   - ◉ Blue circled dot for yarn
   - ▣ Yellow square grid for pnpm
   - ● Cream circle for bun
+- **🔒 Security & Update Monitoring** (NEW!):
+  - Real-time security vulnerability detection
+  - Outdated package detection with semver categorization
+  - Actionable suggestions for fixes and updates
+  - Smart caching (5 min) for performance
 - **Rich Statistics Tooltip**:
   - Dependencies count (production/dev/total)
   - node_modules stats with last updated time
   - Complete list of all scripts with their commands
   - Workspace context for monorepos
+  - Security status and update information
 - **Priority Detection**: bun → pnpm → yarn → npm
-- **Quick Commands**: 
+- **Quick Commands**:
+  - Open package.json with one click
   - Install dependencies with one click
   - Run package.json scripts from a quick pick menu
-  - Select workspace package (for monorepos)
   - Refresh detection manually
 - **Auto-Update**: Watches for changes to lock files and updates automatically
 
@@ -46,11 +52,13 @@ A VS Code extension that automatically detects and displays which package manage
 1. Open a project with a package.json file
 2. The status bar will automatically show an icon and the package manager name in color
 3. Look in the file explorer - package.json will display a colored symbol badge
-4. Click the status bar item to see details and refresh
-5. Use Command Palette commands:
-   - `Refresh Package Manager Detection`
-   - `Install Dependencies`
-   - `Run Script`
+4. Hover over the status bar item to see detailed stats and information
+5. Click the status bar item to open the nearest package.json file
+6. Use Command Palette commands:
+   - `Open package.json` - Opens the relevant package.json
+   - `Refresh Package Manager Detection` - Manually refresh detection
+   - `Install Dependencies` - Run install command
+   - `Run Script` - Select and run a package.json script
 
 ## Custom Logo Icons
 
@@ -63,6 +71,7 @@ You can customize the extension through VS Code settings:
 - **`packageManagerDetector.fileDecorations.enabled`**: Enable or disable the badge on package.json (default: true)
 
 To change the colors used for the status bar background and package.json badge, go to VS Code settings and search for:
+
 - `packageManagerDetector.npm` - Color for npm (default: #CB3837 red)
 - `packageManagerDetector.yarn` - Color for yarn (default: #2C8EBB blue)
 - `packageManagerDetector.pnpm` - Color for pnpm (default: #F9AD00 yellow/gold)
@@ -77,4 +86,3 @@ To change the colors used for the status bar background and package.json badge, 
 ## Building
 
 Run `npm run compile` to build the extension.
-

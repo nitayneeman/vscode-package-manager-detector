@@ -2,6 +2,92 @@
 
 All notable changes to the "Package Manager Detector" extension will be documented in this file.
 
+## [0.3.0] - 2025-01-06
+
+### 🎯 Simplified: Context-Aware Detection
+
+The extension now automatically detects the nearest package.json based on your active file!
+
+#### Changed
+- **Removed Pinned Workspace Feature**: Extension now always uses context-aware detection based on the active file's location
+- **Status Bar Click Action**: Clicking the status bar item now opens the nearest package.json file
+- **Removed Workspace Selector**: The `packageManagerDetector.selectWorkspace` command has been removed
+- **Cleaner Tooltip**: Removed "(pinned)" indicator from tooltip
+
+#### Improved
+- **Better User Experience**: The extension automatically updates as you navigate between different packages in a monorepo
+- **Simpler Workflow**: No need to manually pin/unpin workspaces - the extension intelligently follows your context
+- **Direct Access**: Quick access to the relevant package.json with a single click
+
+## [0.2.0] - 2025-01-06
+
+### 🔒 Major Feature: Security & Update Monitoring
+
+The extension now provides real-time security and package update information!
+
+#### Added
+- **Security Vulnerability Detection**:
+  - Runs `npm/yarn/pnpm audit` to check for security issues
+  - Shows critical, high, moderate, and low severity counts
+  - Displays "✅ No vulnerabilities found" when secure
+  - Suggests fix command: `npm audit fix`
+  - Results cached for 5 minutes to avoid performance impact
+
+- **Outdated Package Detection**:
+  - Runs `npm/yarn/pnpm outdated` to check for updates
+  - Categorizes updates by semver type (major/minor/patch)
+  - Color-coded indicators: 🔴 major, 🟡 minor, 🟢 patch
+  - Shows "✅ All packages up to date" when current
+  - Suggests appropriate update command per package manager
+  - Results cached for 5 minutes
+
+- **Smart Caching**:
+  - Security and outdated checks cached for 5 minutes
+  - Prevents slow performance from running commands repeatedly
+  - Cache invalidated on manual refresh
+
+#### Example Tooltip (With Security Issues):
+```
+🧶 YARN v3.6.4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 Security:
+   🔴 2 critical
+   🟠 3 high
+   🟡 5 moderate
+   💡 Run: yarn audit fix
+
+📦 Updates Available:
+   🔴 2 major updates
+   🟡 5 minor updates
+   🟢 12 patch updates
+   💡 Run: yarn upgrade-interactive
+
+📊 Dependencies:
+   Production: 15 packages
+   Development: 8 packages
+   Total: 23 packages
+
+📜 Available Scripts (5):
+   • dev → vite
+   • build → vite build
+   • test → vitest
+   • lint → eslint .
+   • preview → vite preview
+
+💡 Click to refresh detection
+```
+
+#### Changed
+- Tooltip now fetches security and outdated info asynchronously
+- Commands run with 10-15 second timeout to prevent hanging
+- Gracefully handles cases where audit/outdated commands fail
+
+#### Performance
+- First tooltip hover may take 1-2 seconds (running audit + outdated)
+- Subsequent hovers are instant (cached for 5 minutes)
+- No impact on extension activation or general VS Code performance
+
 ## [0.1.0] - 2025-01-06
 
 ### 🎉 Major Feature: Monorepo Support

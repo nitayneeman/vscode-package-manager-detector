@@ -19,10 +19,11 @@ The extension intelligently determines which workspace package you're currently 
 
 ```
 Priority Order:
-1. 📍 Pinned Workspace (if you manually selected one)
-2. 📂 Active File Context (automatic detection based on current file)
-3. 📦 Root Workspace (fallback)
+1. 📂 Active File Context (automatic detection based on current file)
+2. 📦 Root Workspace (fallback)
 ```
+
+The extension automatically updates as you navigate between different packages in your monorepo!
 
 ### 3. **Smart Tooltip with Workspace Info**
 
@@ -31,7 +32,7 @@ When working in a monorepo, the tooltip shows additional context:
 ```
 🧶 YARN v3.6.4
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 packages/frontend (pinned)
+📍 packages/frontend
 🏗️  Monorepo: 5 workspaces
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📊 Dependencies:
@@ -51,7 +52,7 @@ When working in a monorepo, the tooltip shows additional context:
    • lint → eslint .
    • preview → vite preview
 
-💡 Click to refresh detection
+💡 Click to open package.json
 ```
 
 ## 🎮 Usage
@@ -82,24 +83,15 @@ Your Monorepo Structure:
 Status bar shows: packages/frontend context
 ```
 
-### Manual Selection (Pin a Workspace)
+### Seamless Navigation
 
-You can manually select and "pin" a specific workspace:
+The extension automatically switches context as you navigate between files:
 
-1. **Open Command Palette**: `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
-2. **Run**: `Select Workspace Package (Monorepo)`
-3. **Choose a workspace** from the list:
-   ```
-   📦 Root
-   📁 packages/frontend ✓ Active
-   📁 packages/backend
-   📁 packages/shared
-   ```
-4. **Pin it**: The selected workspace stays active regardless of which file you're editing
+- Open a file in `packages/frontend` → Shows frontend package info
+- Switch to a file in `packages/backend` → Instantly updates to backend package info
+- Open a root-level file → Shows root package info
 
-To **clear the pin** and return to automatic mode:
-1. Run `Select Workspace Package (Monorepo)` again
-2. Select **"Clear Pin (Auto-detect)"** at the top of the list
+**Quick Access**: Click the status bar to open the relevant `package.json` file for your current context!
 
 ## 🔄 When Does Context Update?
 
@@ -110,8 +102,7 @@ The workspace context updates automatically when:
 | **Switch files/tabs** | Detects workspace for new active file |
 | **Modify package.json** | Refreshes workspace detection |
 | **Add/delete lock files** | Re-scans workspaces |
-| **Click status bar** | Manual refresh |
-| **Pin workspace** | Overrides auto-detection |
+| **Click status bar** | Opens the relevant package.json |
 
 ## 📊 Supported Monorepo Tools
 
@@ -175,7 +166,7 @@ packages:
 ✅ Shows scripts for the package you're editing
 ✅ Shows dependencies specific to that package
 ✅ Clear indicator of current workspace
-✅ Quick workspace switching via command
+✅ Automatically switches as you navigate
 ✅ Automatic context detection as you work
 ```
 
