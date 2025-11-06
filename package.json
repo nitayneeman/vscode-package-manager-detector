@@ -2,7 +2,7 @@
   "name": "package-manager-detector",
   "displayName": "Package Manager Detector",
   "description": "Detects and displays which package manager (npm, yarn, pnpm, bun) is used in your project",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "publisher": "nitayneeman",
   "repository": {
     "type": "git",
@@ -87,7 +87,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "package": "vsce package",
-    "install-local": "code --install-extension package-manager-detector-0.0.1.vsix"
+    "install-local": "code --install-extension $(ls package-manager-detector-*.vsix | tail -1)"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",

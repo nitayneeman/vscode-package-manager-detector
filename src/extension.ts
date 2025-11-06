@@ -33,9 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
       "packageManagerDetector.refresh",
       async () => {
         await updatePackageManager();
-        vscode.window.showInformationMessage(
-          `Package Manager: ${currentPackageManager?.type || "unknown"}`
-        );
+        // Notification removed - just refresh silently
       }
     )
   );
@@ -138,14 +136,86 @@ async function updatePackageManager() {
     };
 
     statusBarItem.text = `$(${iconMap[currentPackageManager.type]}) ${currentPackageManager.type}`;
-    statusBarItem.tooltip =
-      `Package Manager: ${currentPackageManager.type}\n` +
-      `Install: ${currentPackageManager.installCommand}\n` +
-      `Run: ${currentPackageManager.runCommand}\n` +
-      (currentPackageManager.lockFile
-        ? `Lock file: ${currentPackageManager.lockFile}`
-        : "") +
-      "\n\nClick to refresh";
+    
+    // Build enhanced tooltip with statistics and health info
+    const packageData = await getPackageJsonData();
+    const nodeModulesStats = await getNodeModulesStats();
+    const lockFileTime = currentPackageManager.lockFile 
+      ? await getLockFileInfo(currentPackageManager.lockFile)
+      : "";
+    
+    // Extract version from packageManager field if available
+    let version = "";
+    if (packageData?.packageManager) {
+      const match = packageData.packageManager.match(/@(.+?)(?:[+@]|$)/);
+      if (match) {
+        version = ` v${match[1]}`;
+      }
+    }
+    
+    // Icon map for package managers
+    const pmIcons: Record<PackageManager, string> = {
+      [PackageManager.NPM]: "📦",
+      [PackageManager.YARN]: "🧶",
+      [PackageManager.PNPM]: "📦",
+      [PackageManager.BUN]: "🥟",
+      [PackageManager.UNKNOWN]: "❓",
+    };
+    
+    let tooltipText = `${pmIcons[currentPackageManager.type]} ${currentPackageManager.type.toUpperCase()}${version}\n`;
+    tooltipText += `${"━".repeat(30)}\n`;
+    
+    // Dependencies statistics
+    const prodDeps = packageData?.dependencies ? Object.keys(packageData.dependencies).length : 0;
+    const devDeps = packageData?.devDependencies ? Object.keys(packageData.devDependencies).length : 0;
+    const totalDeps = prodDeps + devDeps;
+    
+    if (totalDeps > 0) {
+      tooltipText += `📊 Dependencies:\n`;
+      if (prodDeps > 0) {
+        tooltipText += `   Production: ${prodDeps} package${prodDeps !== 1 ? 's' : ''}\n`;
+      }
+      if (devDeps > 0) {
+        tooltipText += `   Development: ${devDeps} package${devDeps !== 1 ? 's' : ''}\n`;
+      }
+      tooltipText += `   Total: ${totalDeps} package${totalDeps !== 1 ? 's' : ''}\n`;
+    }
+    
+    // node_modules info
+    if (nodeModulesStats) {
+      tooltipText += `\n📁 node_modules:\n`;
+      tooltipText += `   Packages: ${nodeModulesStats.count} (updated ${nodeModulesStats.lastModified})\n`;
+    }
+    
+    // Lock file info
+    if (currentPackageManager.lockFile) {
+      tooltipText += `\n🔒 ${currentPackageManager.lockFile}`;
+      if (lockFileTime) {
+        tooltipText += ` (modified ${lockFileTime})`;
+      }
+      tooltipText += `\n`;
+    }
+    
+    // Available scripts with commands
+    if (packageData?.scripts) {
+      const scripts = Object.entries(packageData.scripts);
+      if (scripts.length > 0) {
+        tooltipText += `\n📜 Available Scripts (${scripts.length}):\n`;
+        scripts.forEach(([name, command]) => {
+          // Truncate long commands
+          const truncatedCommand = command.length > 40 
+            ? command.substring(0, 37) + "..." 
+            : command;
+          tooltipText += `   • ${name} → ${truncatedCommand}\n`;
+        });
+      }
+    } else {
+      tooltipText += `\n⚠️  No scripts defined in package.json\n`;
+    }
+    
+    tooltipText += `\n💡 Click to refresh detection`;
+    
+    statusBarItem.tooltip = tooltipText;
     
     // Set text color based on package manager
     const colorMap: Record<PackageManager, vscode.ThemeColor> = {
@@ -162,10 +232,17 @@ async function updatePackageManager() {
   statusBarItem.show();
 }
 
-async function getAvailableScripts(): Promise<string[]> {
+interface PackageJsonData {
+  scripts?: Record<string, string>;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  packageManager?: string;
+}
+
+async function getPackageJsonData(): Promise<PackageJsonData | null> {
   const workspaceFolders = vscode.workspace.workspaceFolders;
   if (!workspaceFolders || workspaceFolders.length === 0) {
-    return [];
+    return null;
   }
 
   const packageJsonUri = vscode.Uri.joinPath(
@@ -175,16 +252,87 @@ async function getAvailableScripts(): Promise<string[]> {
 
   try {
     const content = await vscode.workspace.fs.readFile(packageJsonUri);
-    const packageJson = JSON.parse(content.toString());
-
-    if (packageJson.scripts) {
-      return Object.keys(packageJson.scripts);
-    }
+    return JSON.parse(content.toString());
   } catch (error) {
     console.error("Error reading package.json:", error);
+    return null;
+  }
+}
+
+async function getAvailableScripts(): Promise<string[]> {
+  const data = await getPackageJsonData();
+  return data?.scripts ? Object.keys(data.scripts) : [];
+}
+
+async function getNodeModulesStats(): Promise<{ count: number; lastModified: string } | null> {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders || workspaceFolders.length === 0) {
+    return null;
   }
 
-  return [];
+  const nodeModulesUri = vscode.Uri.joinPath(
+    workspaceFolders[0].uri,
+    "node_modules"
+  );
+
+  try {
+    const stat = await vscode.workspace.fs.stat(nodeModulesUri);
+    const entries = await vscode.workspace.fs.readDirectory(nodeModulesUri);
+    
+    // Count packages (excluding .bin, .cache, etc.)
+    const packageCount = entries.filter(([name, type]) => 
+      type === vscode.FileType.Directory && !name.startsWith('.')
+    ).length;
+
+    // Format last modified time
+    const now = Date.now();
+    const diff = now - stat.mtime;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(hours / 24);
+    
+    let lastModified: string;
+    if (days > 0) {
+      lastModified = `${days}d ago`;
+    } else if (hours > 0) {
+      lastModified = `${hours}h ago`;
+    } else {
+      lastModified = "just now";
+    }
+
+    return { count: packageCount, lastModified };
+  } catch (error) {
+    return null;
+  }
+}
+
+async function getLockFileInfo(lockFileName: string): Promise<string> {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders || !lockFileName) {
+    return "";
+  }
+
+  const lockFileUri = vscode.Uri.joinPath(
+    workspaceFolders[0].uri,
+    lockFileName
+  );
+
+  try {
+    const stat = await vscode.workspace.fs.stat(lockFileUri);
+    const now = Date.now();
+    const diff = now - stat.mtime;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(hours / 24);
+    
+    if (days > 0) {
+      return `${days}d ago`;
+    } else if (hours > 0) {
+      return `${hours}h ago`;
+    } else {
+      return "just now";
+    }
+  } catch (error) {
+    return "";
+  }
 }
 
 export function deactivate() {
