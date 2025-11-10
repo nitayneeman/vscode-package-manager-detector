@@ -2,6 +2,78 @@
 
 All notable changes to the "Package Manager Detector" extension will be documented in this file.
 
+## [0.4.1] - 2025-01-10
+
+### 🎯 Removed File Decorations (Kept Status Bar Colors)
+
+Simplified the extension by removing file explorer decorations while keeping the colored status bar.
+
+#### ❌ Removed
+- **File Decoration Provider**: Removed colored badges on package.json in file explorer
+- **File Decoration Configuration**: Removed settings option to toggle decorations
+
+#### ✅ What Remains
+- ✅ Status bar indicator with icon and **colored text**
+  - 🔴 npm in red
+  - 🔵 yarn in blue  
+  - 🟡 pnpm in yellow/gold
+  - ⚪ bun in cream
+- ✅ Simple tooltip with version, dependencies, and scripts
+- ✅ Click to open package.json
+- ✅ Auto-update via file watchers
+
+#### 📊 Impact
+- No visual clutter in file explorer
+- Colored status bar still provides at-a-glance PM identification
+- Zero configuration needed
+
+## [0.4.0] - 2025-01-10
+
+### 🧹 Major Cleanup: Minimal & Fast Version
+
+This release dramatically simplifies the extension by removing features that added complexity without providing essential value. The extension is now ~50% smaller, faster, and focuses on doing one thing well: showing you which package manager your project uses.
+
+#### ❌ Removed Features
+- **Monorepo Support** (~200 lines): Removed context-aware detection and workspace management
+- **Security Audit** (~100 lines): Removed vulnerability scanning (can be slow/unreliable)
+- **Outdated Packages Check** (~100 lines): Removed update detection (can be slow)
+- **"Install Dependencies" Command**: VS Code already has a terminal
+- **"Run Script" Command**: VS Code already has npm scripts explorer
+- **"Refresh Detection" Command**: File watchers handle this automatically
+
+#### ✅ What Remains (Core Features)
+- ✅ Package manager detection (npm/yarn/pnpm/bun)
+- ✅ Status bar with icon + colored text
+- ✅ File decoration on package.json with colored badge
+- ✅ Click to open package.json
+- ✅ Simple tooltip: PM name, version, dependency count, scripts list
+- ✅ Auto-update via file watchers
+
+#### 📊 Impact
+- **Code Size**: 865 lines → 233 lines (~73% reduction)
+- **Performance**: No more external command execution (npm audit, npm outdated)
+- **Reliability**: No network dependencies, no timeouts, no caching complexity
+- **Simplicity**: One command, one purpose, no overwhelming options
+
+#### New Tooltip Format
+```
+📦 Npm v9.8.1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 23 dependencies
+
+📜 Scripts (7):
+   • dev → vite
+   • build → tsc && vite build
+   • test → vitest
+   • lint → eslint .
+   • format → prettier --write .
+   • preview → vite preview
+   • type-check → tsc --noEmit
+
+💡 Click to open package.json
+```
+
 ## [0.3.1] - 2025-01-06
 
 ### 🎨 Improved: Simplified Tooltip

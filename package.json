@@ -2,7 +2,7 @@
   "name": "package-manager-detector",
   "displayName": "Package Manager Detector",
   "description": "Detects and displays which package manager (npm, yarn, pnpm, bun) is used in your project",
-  "version": "0.3.1",
+  "version": "0.4.1",
   "publisher": "nitayneeman",
   "repository": {
     "type": "git",
@@ -21,26 +21,14 @@
   "contributes": {
     "commands": [
       {
-        "command": "packageManagerDetector.refresh",
-        "title": "Refresh Package Manager Detection"
-      },
-      {
         "command": "packageManagerDetector.openPackageJson",
         "title": "Open package.json"
-      },
-      {
-        "command": "packageManagerDetector.install",
-        "title": "Install Dependencies"
-      },
-      {
-        "command": "packageManagerDetector.run",
-        "title": "Run Script"
       }
     ],
     "colors": [
       {
         "id": "packageManagerDetector.npm",
-        "description": "Color for npm-related files",
+        "description": "Color for npm in status bar",
         "defaults": {
           "dark": "#CB3837",
           "light": "#CB3837",
@@ -49,7 +37,7 @@
       },
       {
         "id": "packageManagerDetector.yarn",
-        "description": "Color for yarn-related files",
+        "description": "Color for yarn in status bar",
         "defaults": {
           "dark": "#2C8EBB",
           "light": "#2C8EBB",
@@ -58,7 +46,7 @@
       },
       {
         "id": "packageManagerDetector.pnpm",
-        "description": "Color for pnpm-related files",
+        "description": "Color for pnpm in status bar",
         "defaults": {
           "dark": "#F9AD00",
           "light": "#F9AD00",
@@ -67,24 +55,14 @@
       },
       {
         "id": "packageManagerDetector.bun",
-        "description": "Color for bun-related files",
+        "description": "Color for bun in status bar",
         "defaults": {
           "dark": "#FBF0DF",
           "light": "#F9F1E1",
           "highContrast": "#FBF0DF"
         }
       }
-    ],
-    "configuration": {
-      "title": "Package Manager Detector",
-      "properties": {
-        "packageManagerDetector.fileDecorations.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable the colored symbol badge on package.json"
-        }
-      }
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

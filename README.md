@@ -1,44 +1,22 @@
 # Package Manager Detector
 
-A VS Code extension that automatically detects and displays which package manager (npm, yarn, pnpm, or bun) is being used in your project.
+A lightweight VS Code extension that automatically detects and displays which package manager (npm, yarn, pnpm, or bun) is being used in your project.
 
 ## Features
 
 - **Automatic Detection**: Identifies package manager based on lock files
-- **🏗️ Monorepo Support**:
-  - Auto-detects npm/yarn/pnpm workspaces, Lerna, and Turborepo
-  - Context-aware detection based on active file location
-  - Shows workspace-specific stats and scripts
-  - Automatically switches context as you navigate
-  - [Learn more](./MONOREPO_SUPPORT.md)
 - **Color-Coded Status Bar**: Shows icon and package manager name with colored text
   - 🔴 **npm**: Icon + name in red (#CB3837)
   - 🔵 **yarn**: Icon + name in blue (#2C8EBB)
   - 🟡 **pnpm**: Icon + name in yellow/gold (#F9AD00)
   - ⚪ **bun**: Icon + name in cream (#FBF0DF)
-- **File Badge on package.json**: Visual badge with distinctive symbol appears only on package.json:
-  - ◆ Red diamond for npm
-  - ◉ Blue circled dot for yarn
-  - ▣ Yellow square grid for pnpm
-  - ● Cream circle for bun
-- **🔒 Security & Update Monitoring** (NEW!):
-  - Real-time security vulnerability detection
-  - Outdated package detection with semver categorization
-  - Actionable suggestions for fixes and updates
-  - Smart caching (5 min) for performance
-- **Rich Statistics Tooltip**:
-  - Dependencies count (production/dev/total)
-  - node_modules stats with last updated time
+- **Simple Tooltip**: Hover to see:
+  - Package manager name and version
+  - Total dependency count
   - Complete list of all scripts with their commands
-  - Workspace context for monorepos
-  - Security status and update information
 - **Priority Detection**: bun → pnpm → yarn → npm
-- **Quick Commands**:
-  - Open package.json with one click
-  - Install dependencies with one click
-  - Run package.json scripts from a quick pick menu
-  - Refresh detection manually
 - **Auto-Update**: Watches for changes to lock files and updates automatically
+- **One-Click Access**: Click status bar to open package.json
 
 ## Supported Package Managers
 
@@ -51,38 +29,27 @@ A VS Code extension that automatically detects and displays which package manage
 
 1. Open a project with a package.json file
 2. The status bar will automatically show an icon and the package manager name in color
-3. Look in the file explorer - package.json will display a colored symbol badge
-4. Hover over the status bar item to see detailed stats and information
-5. Click the status bar item to open the nearest package.json file
-6. Use Command Palette commands:
-   - `Open package.json` - Opens the relevant package.json
-   - `Refresh Package Manager Detection` - Manually refresh detection
-   - `Install Dependencies` - Run install command
-   - `Run Script` - Select and run a package.json script
-
-## Custom Logo Icons
-
-The extension currently uses VS Code's built-in codicons. To use the real package manager logos, see [CUSTOM_ICONS_GUIDE.md](./CUSTOM_ICONS_GUIDE.md) for instructions on converting the SVG icons to a custom font.
+3. Hover over the status bar item to see dependency count and available scripts
+4. Click the status bar item to open package.json
 
 ## Configuration
 
-You can customize the extension through VS Code settings:
+No configuration needed! The extension works out of the box.
 
-- **`packageManagerDetector.fileDecorations.enabled`**: Enable or disable the badge on package.json (default: true)
+## Why This Extension?
 
-To change the colors used for the status bar background and package.json badge, go to VS Code settings and search for:
-
-- `packageManagerDetector.npm` - Color for npm (default: #CB3837 red)
-- `packageManagerDetector.yarn` - Color for yarn (default: #2C8EBB blue)
-- `packageManagerDetector.pnpm` - Color for pnpm (default: #F9AD00 yellow/gold)
-- `packageManagerDetector.bun` - Color for bun (default: #FBF0DF cream)
+When working with multiple projects, it's easy to forget which package manager each project uses. This extension provides an instant, at-a-glance indicator so you never accidentally run `npm install` in a yarn project (or vice versa).
 
 ## Development
 
-1. Install dependencies: `npm install`
+1. Install dependencies: `yarn install` or `npm install`
 2. Compile: `npm run compile`
 3. Press F5 to launch in debug mode
 
 ## Building
 
 Run `npm run compile` to build the extension.
+
+## License
+
+MIT
