@@ -27,14 +27,14 @@ The test runner automatically downloads and caches VS Code in `.vscode-test/` di
 Tests are kept in a dedicated root-level `test/` directory:
 - Cleaner project structure
 - Separate TypeScript configuration for tests
-- Compiled test files stay in the test directory
+- Compiled test files go to `out/test/` (not in source tree)
 - Root `package.json` is the only package manager file at root level
 
 ### 🔧 Test Configuration
 The `test/tsconfig.json` extends the main configuration but:
-- Compiles tests in place (not to `out/`)
+- Compiles tests to `out/test/` directory
 - Includes type definitions for Mocha and Node.js
-- Only processes files in the test directory
+- Processes test files and allows imports from `../src/`
 
 ## Running Tests
 
@@ -42,12 +42,12 @@ From the project root:
 
 ```bash
 # Run all tests (compiles and runs)
-yarn test
+npm test
 
 # Or step by step:
-yarn compile              # Compile source
-yarn compile:tests        # Compile tests  
-node ./test/runTest.js   # Run tests
+npm run compile              # Compile source to out/
+npm run compile:tests        # Compile tests to out/test/
+node ./out/test/test/runTest.js   # Run tests
 ```
 
 ## Debugging Tests
