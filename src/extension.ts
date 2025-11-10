@@ -82,18 +82,12 @@ async function updatePackageManager() {
     statusBarItem.tooltip = "No package manager detected";
     statusBarItem.color = undefined;
   } else {
-    // Icon map using codicons
-    const iconMap: Record<PackageManager, string> = {
-      [PackageManager.NPM]: "package",
-      [PackageManager.YARN]: "symbol-color",
-      [PackageManager.PNPM]: "layers",
-      [PackageManager.BUN]: "circle-filled",
-      [PackageManager.UNKNOWN]: "question",
-    };
-
-    statusBarItem.text = `$(${iconMap[currentPackageManager.type]}) ${
-      currentPackageManager.type
-    }`;
+    // Format package manager name - keep yarn lowercase, capitalize others
+    const pmName = currentPackageManager.type === PackageManager.YARN
+                   ? "yarn"
+                   : currentPackageManager.type.charAt(0).toUpperCase() + 
+                     currentPackageManager.type.slice(1).toLowerCase();
+    statusBarItem.text = pmName;
 
     // Build simplified tooltip
     const packageData = await getPackageJsonData();
@@ -107,23 +101,7 @@ async function updatePackageManager() {
       }
     }
 
-    // Icon map for package managers
-    const pmIcons: Record<PackageManager, string> = {
-      [PackageManager.NPM]: "📦",
-      [PackageManager.YARN]: "🧶",
-      [PackageManager.PNPM]: "📦",
-      [PackageManager.BUN]: "🥟",
-      [PackageManager.UNKNOWN]: "❓",
-    };
-
-    // Format package manager name as Word Case
-    const pmName =
-      currentPackageManager.type.charAt(0).toUpperCase() +
-      currentPackageManager.type.slice(1).toLowerCase();
-
-    let tooltipText = `${
-      pmIcons[currentPackageManager.type]
-    } ${pmName}${version}\n`;
+    let tooltipText = `${pmName}${version}\n`;
     tooltipText += `${"━".repeat(30)}\n`;
 
     // Dependencies count

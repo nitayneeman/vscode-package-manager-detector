@@ -2,6 +2,20 @@
 
 All notable changes to the "Package Manager Detector" extension will be documented in this file.
 
+## [0.4.2] - 2025-01-10
+
+### 🎨 Improved Visual Design
+
+Enhanced the visual appearance with better logos and text styling.
+
+#### ✨ Improvements
+- **Improved SVG Logos**: All package manager icons (npm, yarn, pnpm, bun) now have better, more polished designs
+  - Larger size (24x24 instead of 16x16)
+  - Rounded corners for a modern look
+  - Better contrast and details
+- **Better Text Styling**: Status bar now shows package manager names in Word Case (Npm, Yarn, Pnpm, Bun)
+- **Removed QUICKSTART.md**: Simplified documentation
+
 ## [0.4.1] - 2025-01-10
 
 ### 🎯 Removed File Decorations (Kept Status Bar Colors)

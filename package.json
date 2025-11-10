@@ -2,7 +2,7 @@
   "name": "package-manager-detector",
   "displayName": "Package Manager Detector",
   "description": "Detects and displays which package manager (npm, yarn, pnpm, bun) is used in your project",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "publisher": "nitayneeman",
   "repository": {
     "type": "git",
