@@ -82,11 +82,8 @@ async function updatePackageManager() {
     statusBarItem.tooltip = "No package manager detected";
     statusBarItem.color = undefined;
   } else {
-    // Format package manager name - keep yarn lowercase, capitalize others
-    const pmName = currentPackageManager.type === PackageManager.YARN
-                   ? "yarn"
-                   : currentPackageManager.type.charAt(0).toUpperCase() + 
-                     currentPackageManager.type.slice(1).toLowerCase();
+    // Format package manager name - always lowercase
+    const pmName = currentPackageManager.type.toLowerCase();
     statusBarItem.text = pmName;
 
     // Build simplified tooltip

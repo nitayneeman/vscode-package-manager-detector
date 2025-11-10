@@ -35,7 +35,7 @@ The extension automatically detects your package manager when you open a workspa
 - **Real-time Updates**: Watches for changes to lock files and `package.json`
 
 ### Status Bar Display
-Shows the detected package manager in the status bar with color-coded text:
+Shows the detected package manager in the status bar with color-coded text (all lowercase):
 - **npm** - Red (`#CB3837`)
 - **yarn** - Blue (`#2C8EBB`)
 - **pnpm** - Orange (`#F9AD00`)
@@ -53,9 +53,9 @@ Hover over the status bar item to see:
 The extension follows this detection priority:
 
 1. **Lock Files** (highest priority)
-   - `bun.lockb` → Bun
+   - `bun.lockb` → bun
    - `pnpm-lock.yaml` → pnpm
-   - `yarn.lock` → Yarn
+   - `yarn.lock` → yarn
    - `package-lock.json` → npm
 
 2. **packageManager Field** (fallback)
