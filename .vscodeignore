@@ -1,15 +1,36 @@
-.vscode/**
-.vscode-test/**
-src/**
-.gitignore
-.yarnrc
-.history/**
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
-**/*.map
-**/*.ts
-!out/**/*.js
-node_modules/**
-*.vsix
+# Source TypeScript files
+src/**/*.ts
+test/**
 
+# Build configuration
+tsconfig.json
+.vscode-test*
+.vscode-test/
+
+# Git
+.git
+.gitignore
+.github/
+
+# NPM
+node_modules/
+package-lock.json
+.npmignore
+
+# Documentation
+TESTING.md
+V0.4.0_CLEANUP_SUMMARY.md
+
+# Compiled test files
+**/*.test.js
+**/*.test.js.map
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Old packages
+*.vsix

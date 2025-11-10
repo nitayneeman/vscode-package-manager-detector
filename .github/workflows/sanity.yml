@@ -1,0 +1,80 @@
+name: Sanity Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Cache VS Code download
+        id: cache-vscode
+        uses: actions/cache@v4
+        with:
+          path: .vscode-test
+          key: vscode-${{ runner.os }}-stable
+          restore-keys: |
+            vscode-${{ runner.os }}-
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Check TypeScript compilation
+        run: npm run compile
+      
+      - name: Check test compilation
+        run: npm run compile:tests
+      
+      - name: Verify package.json
+        run: |
+          # Check that only npm is used (no yarn.lock, .pnp files, .yarn directory)
+          if [ -f "yarn.lock" ] || [ -f ".pnp.cjs" ] || [ -d ".yarn" ]; then
+            echo "Error: Found Yarn-specific files. This project should only use npm."
+            exit 1
+          fi
+          echo "✓ Clean root directory - only npm package manager"
+      
+      - name: Run tests
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm test
+      
+      - name: Check for linting errors
+        run: |
+          # Verify compiled output exists
+          if [ ! -d "out" ]; then
+            echo "Error: Compiled output directory 'out' not found"
+            exit 1
+          fi
+          if [ ! -f "out/extension.js" ]; then
+            echo "Error: Compiled extension.js not found"
+            exit 1
+          fi
+          echo "✓ Extension compiled successfully"
+      
+      - name: Verify test structure
+        run: |
+          # Check that tests are in the dedicated test/ directory
+          if [ ! -d "test/suite" ]; then
+            echo "Error: Test suite directory not found"
+            exit 1
+          fi
+          if [ -d "src/test" ]; then
+            echo "Error: Found tests in src/test. Tests should be in root test/ directory only."
+            exit 1
+          fi
+          echo "✓ Tests are in dedicated test/ directory"
+
