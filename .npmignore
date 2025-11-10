@@ -12,8 +12,7 @@ test/tsconfig.json
 .vscode-test-*
 
 # Documentation (except README)
-TESTING.md
-V0.4.0_CLEANUP_SUMMARY.md
+# Keep only README.md and CHANGELOG.md
 
 # Dependencies
 node_modules/
