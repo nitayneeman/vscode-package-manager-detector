@@ -76,83 +76,81 @@ async function updatePackageManager() {
     workspaceFolders[0]
   );
 
-  // Update status bar
-  if (currentPackageManager.type === PackageManager.UNKNOWN) {
-    statusBarItem.text = "$(question) No PM";
-    statusBarItem.tooltip = "No package manager detected";
-    statusBarItem.color = undefined;
-  } else {
-    // Format package manager name - always lowercase
-    const pmName = currentPackageManager.type.toLowerCase();
-    statusBarItem.text = pmName;
+  // Update status bar - default to npm if unknown
+  const pmType = currentPackageManager.type === PackageManager.UNKNOWN 
+    ? PackageManager.NPM 
+    : currentPackageManager.type;
 
-    // Build simplified tooltip
-    const packageData = await getPackageJsonData();
+  // Format package manager name - always lowercase
+  const pmName = pmType.toLowerCase();
+  statusBarItem.text = pmName;
 
-    // Extract version from packageManager field if available
-    let version = "";
-    if (packageData?.packageManager) {
-      const match = packageData.packageManager.match(/@(.+?)(?:[+@]|$)/);
-      if (match) {
-        version = ` v${match[1]}`;
-      }
+  // Build simplified tooltip
+  const packageData = await getPackageJsonData();
+
+  // Extract version from packageManager field if available
+  let version = "";
+  if (packageData?.packageManager) {
+    const match = packageData.packageManager.match(/@(.+?)(?:[+@]|$)/);
+    if (match) {
+      version = ` v${match[1]}`;
     }
-
-    let tooltipText = `${pmName}${version}\n`;
-    tooltipText += `${"━".repeat(30)}\n`;
-
-    // Dependencies count
-    const totalDeps =
-      (packageData?.dependencies
-        ? Object.keys(packageData.dependencies).length
-        : 0) +
-      (packageData?.devDependencies
-        ? Object.keys(packageData.devDependencies).length
-        : 0);
-
-    if (totalDeps > 0) {
-      tooltipText += `\n📊 ${totalDeps} dependenc${
-        totalDeps === 1 ? "y" : "ies"
-      }\n`;
-    }
-
-    // Available scripts with commands
-    if (packageData?.scripts) {
-      const scripts = Object.entries(packageData.scripts);
-      if (scripts.length > 0) {
-        tooltipText += `\n📜 Scripts (${scripts.length}):\n`;
-        scripts.forEach(([name, command]) => {
-          // Truncate long commands
-          const truncatedCommand =
-            command.length > 40 ? command.substring(0, 37) + "..." : command;
-          tooltipText += `   • ${name} → ${truncatedCommand}\n`;
-        });
-      }
-    } else {
-      tooltipText += `\n⚠️  No scripts defined\n`;
-    }
-
-    tooltipText += `\n💡 Click to open package.json`;
-
-    statusBarItem.tooltip = tooltipText;
-
-    // Set text color based on package manager
-    const colorMap: Record<PackageManager, vscode.ThemeColor> = {
-      [PackageManager.NPM]: new vscode.ThemeColor("packageManagerDetector.npm"),
-      [PackageManager.YARN]: new vscode.ThemeColor(
-        "packageManagerDetector.yarn"
-      ),
-      [PackageManager.PNPM]: new vscode.ThemeColor(
-        "packageManagerDetector.pnpm"
-      ),
-      [PackageManager.BUN]: new vscode.ThemeColor("packageManagerDetector.bun"),
-      [PackageManager.UNKNOWN]: new vscode.ThemeColor(
-        "statusBarItem.errorForeground"
-      ),
-    };
-
-    statusBarItem.color = colorMap[currentPackageManager.type];
   }
+
+  let tooltipText = `${pmName}${version}\n`;
+  tooltipText += `${"━".repeat(30)}\n`;
+
+  // Dependencies count
+  const totalDeps =
+    (packageData?.dependencies
+      ? Object.keys(packageData.dependencies).length
+      : 0) +
+    (packageData?.devDependencies
+      ? Object.keys(packageData.devDependencies).length
+      : 0);
+
+  if (totalDeps > 0) {
+    tooltipText += `\n📊 ${totalDeps} dependenc${
+      totalDeps === 1 ? "y" : "ies"
+    }\n`;
+  }
+
+  // Available scripts with commands
+  if (packageData?.scripts) {
+    const scripts = Object.entries(packageData.scripts);
+    if (scripts.length > 0) {
+      tooltipText += `\n📜 Scripts (${scripts.length}):\n`;
+      scripts.forEach(([name, command]) => {
+        // Truncate long commands
+        const truncatedCommand =
+          command.length > 40 ? command.substring(0, 37) + "..." : command;
+        tooltipText += `   • ${name} → ${truncatedCommand}\n`;
+      });
+    }
+  } else {
+    tooltipText += `\n⚠️  No scripts defined\n`;
+  }
+
+  tooltipText += `\n💡 Click to open package.json`;
+
+  statusBarItem.tooltip = tooltipText;
+
+  // Set text color based on package manager
+  const colorMap: Record<PackageManager, vscode.ThemeColor> = {
+    [PackageManager.NPM]: new vscode.ThemeColor("packageManagerDetector.npm"),
+    [PackageManager.YARN]: new vscode.ThemeColor(
+      "packageManagerDetector.yarn"
+    ),
+    [PackageManager.PNPM]: new vscode.ThemeColor(
+      "packageManagerDetector.pnpm"
+    ),
+    [PackageManager.BUN]: new vscode.ThemeColor("packageManagerDetector.bun"),
+    [PackageManager.UNKNOWN]: new vscode.ThemeColor(
+      "packageManagerDetector.npm"
+    ),
+  };
+
+  statusBarItem.color = colorMap[pmType];
 
   statusBarItem.show();
 }
