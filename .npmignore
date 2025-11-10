@@ -1,0 +1,32 @@
+# Source files
+src/
+test/
+*.ts
+tsconfig.json
+test/tsconfig.json
+
+# Development files
+.vscode/
+.github/
+.vscode-test/
+.vscode-test-*
+
+# Documentation (except README)
+TESTING.md
+V0.4.0_CLEANUP_SUMMARY.md
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
