@@ -11,7 +11,7 @@
 This Visual Studio Code extension automatically detects and displays which package manager (npm, yarn, pnpm, or bun) is used in your project. It shows the detected package manager in the status bar with color-coded indicators and provides quick access to package.json.
 
 <p align="center">
-  <img src="https://github.com/nitayneeman/vscode-package-manager-detector/blob/main/images/preview.gif?raw=true" alt="Preview">
+  <img src="https://github.com/nitayneeman/vscode-package-manager-detector/blob/main/images/preview.gif?raw=true" alt="Preview" width="300">
 </p>
 
 The extension intelligently detects package managers by analyzing:
