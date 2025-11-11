@@ -100,32 +100,25 @@ async function updatePackageManager() {
   let tooltipText = `${pmName}${version}\n`;
   tooltipText += `${"━".repeat(30)}\n`;
 
-  // Dependencies count
-  const totalDeps =
-    (packageData?.dependencies
-      ? Object.keys(packageData.dependencies).length
-      : 0) +
-    (packageData?.devDependencies
-      ? Object.keys(packageData.devDependencies).length
-      : 0);
-
-  if (totalDeps > 0) {
-    tooltipText += `\n📊 ${totalDeps} dependenc${
-      totalDeps === 1 ? "y" : "ies"
-    }\n`;
-  }
-
-  // Available scripts with commands
+  // Available scripts with commands (limit to first 8 to ensure tooltip fits)
   if (packageData?.scripts) {
     const scripts = Object.entries(packageData.scripts);
     if (scripts.length > 0) {
-      tooltipText += `\n📜 Scripts (${scripts.length}):\n`;
-      scripts.forEach(([name, command]) => {
+      const maxScripts = 8;
+      const scriptsToShow = scripts.slice(0, maxScripts);
+      const remaining = scripts.length - scriptsToShow.length;
+      
+      tooltipText += `\n📜 Scripts:\n`;
+      scriptsToShow.forEach(([name, command]) => {
         // Truncate long commands
         const truncatedCommand =
           command.length > 40 ? command.substring(0, 37) + "..." : command;
         tooltipText += `   • ${name} → ${truncatedCommand}\n`;
       });
+      
+      if (remaining > 0) {
+        tooltipText += `   … and ${remaining} more\n`;
+      }
     }
   } else {
     tooltipText += `\n⚠️  No scripts defined\n`;
