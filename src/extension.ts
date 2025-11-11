@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import * as fs from "fs";
 import {
   PackageManagerDetector,
   PackageManagerInfo,
@@ -57,8 +58,38 @@ export function activate(context: vscode.ExtensionContext) {
   fileWatcher.onDidChange(() => updatePackageManager());
   context.subscriptions.push(fileWatcher);
 
+  // Watch for active editor changes (for monorepo support)
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor(() => updatePackageManager())
+  );
+
   // Initial detection
   updatePackageManager();
+}
+
+/**
+ * Find the nearest package.json directory from the given file path
+ * by walking up the directory tree
+ */
+function findNearestPackageJson(filePath: string, workspaceFolderPath: string): string | undefined {
+  let currentDir = path.dirname(filePath);
+  
+  // Walk up the directory tree until we hit the workspace root
+  while (currentDir.startsWith(workspaceFolderPath)) {
+    const packageJsonPath = path.join(currentDir, "package.json");
+    if (fs.existsSync(packageJsonPath)) {
+      return currentDir;
+    }
+    
+    const parentDir = path.dirname(currentDir);
+    // Prevent infinite loop if we can't go up anymore
+    if (parentDir === currentDir) {
+      break;
+    }
+    currentDir = parentDir;
+  }
+  
+  return undefined;
 }
 
 async function updatePackageManager() {
@@ -69,12 +100,35 @@ async function updatePackageManager() {
     return;
   }
 
-  workspaceRoot = workspaceFolders[0].uri.fsPath;
-
-  // Detect package manager
-  currentPackageManager = await PackageManagerDetector.detect(
-    workspaceFolders[0]
-  );
+  const workspaceFolder = workspaceFolders[0];
+  
+  // For monorepo support: find nearest package.json based on active editor
+  const activeEditor = vscode.window.activeTextEditor;
+  if (activeEditor) {
+    const activeFilePath = activeEditor.document.uri.fsPath;
+    const nearestPackageDir = findNearestPackageJson(activeFilePath, workspaceFolder.uri.fsPath);
+    
+    if (nearestPackageDir) {
+      workspaceRoot = nearestPackageDir;
+      
+      // Create a temporary workspace folder for detection
+      const nearestWorkspaceFolder: vscode.WorkspaceFolder = {
+        uri: vscode.Uri.file(nearestPackageDir),
+        name: path.basename(nearestPackageDir),
+        index: 0
+      };
+      
+      currentPackageManager = await PackageManagerDetector.detect(nearestWorkspaceFolder);
+    } else {
+      // Fall back to workspace root if no package.json found
+      workspaceRoot = workspaceFolder.uri.fsPath;
+      currentPackageManager = await PackageManagerDetector.detect(workspaceFolder);
+    }
+  } else {
+    // No active editor, use workspace root
+    workspaceRoot = workspaceFolder.uri.fsPath;
+    currentPackageManager = await PackageManagerDetector.detect(workspaceFolder);
+  }
 
   // Update status bar - default to npm if unknown
   const pmType = currentPackageManager.type === PackageManager.UNKNOWN 
@@ -100,32 +154,25 @@ async function updatePackageManager() {
   let tooltipText = `${pmName}${version}\n`;
   tooltipText += `${"━".repeat(30)}\n`;
 
-  // Dependencies count
-  const totalDeps =
-    (packageData?.dependencies
-      ? Object.keys(packageData.dependencies).length
-      : 0) +
-    (packageData?.devDependencies
-      ? Object.keys(packageData.devDependencies).length
-      : 0);
-
-  if (totalDeps > 0) {
-    tooltipText += `\n📊 ${totalDeps} dependenc${
-      totalDeps === 1 ? "y" : "ies"
-    }\n`;
-  }
-
-  // Available scripts with commands
+  // Available scripts with commands (limit to first 8 to ensure tooltip fits)
   if (packageData?.scripts) {
     const scripts = Object.entries(packageData.scripts);
     if (scripts.length > 0) {
-      tooltipText += `\n📜 Scripts (${scripts.length}):\n`;
-      scripts.forEach(([name, command]) => {
+      const maxScripts = 8;
+      const scriptsToShow = scripts.slice(0, maxScripts);
+      const remaining = scripts.length - scriptsToShow.length;
+      
+      tooltipText += `\n📜 Scripts:\n`;
+      scriptsToShow.forEach(([name, command]) => {
         // Truncate long commands
         const truncatedCommand =
           command.length > 40 ? command.substring(0, 37) + "..." : command;
         tooltipText += `   • ${name} → ${truncatedCommand}\n`;
       });
+      
+      if (remaining > 0) {
+        tooltipText += `   … and ${remaining} more\n`;
+      }
     }
   } else {
     tooltipText += `\n⚠️  No scripts defined\n`;

@@ -2,6 +2,51 @@
 
 All notable changes to the "Package Manager Detector" extension will be documented in this file.
 
+## [0.5.0] - 2025-01-11
+
+### 🎯 Monorepo Support & UI Refinements
+
+Added intelligent monorepo support and cleaned up the user interface for a better experience.
+
+#### ✨ Added
+- **Monorepo Support**: Automatically detects the nearest `package.json` based on the active file
+  - Walks up the directory tree to find the closest package manager context
+  - Status bar updates automatically when switching between files in different packages
+  - Falls back to workspace root when no active editor or package.json found
+- **Active Editor Tracking**: Extension now listens to editor changes to update package manager context
+
+#### 🎨 Improved
+- **Cleaner Status Bar**: Removed "No PM" display - now defaults to showing "npm" when no package manager is detected
+- **Simplified Tooltip**: Removed dependency count (less actionable information)
+- **Better Tooltip UX**: Limited scripts list to 8 entries with "… and X more" indicator
+  - Ensures the "Click to open package.json" hint always stays visible
+  - Prevents tooltip from being cut off with long script lists
+- **Lowercase Package Manager Names**: Changed from "Npm", "Yarn", etc. to "npm", "yarn" for consistency
+
+#### 🗑️ Removed
+- "No PM" indicator when package manager is unknown
+- Dependency count from tooltip
+- Script count from tooltip header (was "Scripts (7)", now just "Scripts")
+
+#### Example Tooltip (Monorepo Package):
+```
+npm v10.0.0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📜 Scripts:
+   • dev → vite
+   • build → tsc && vite build
+   • test → vitest
+   • lint → eslint .
+   • preview → vite preview
+   • type-check → tsc --noEmit
+   • format → prettier --write .
+   • clean → rm -rf dist
+   … and 3 more
+
+💡 Click to open package.json
+```
+
 ## [0.4.2] - 2025-01-10
 
 ### 🎨 Improved Visual Design
