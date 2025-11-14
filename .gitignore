@@ -47,3 +47,5 @@ bun.lockb
 *.tmp
 *.temp
 .cache/
+
+.history/
