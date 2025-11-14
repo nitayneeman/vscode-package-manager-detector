@@ -1,9 +1,9 @@
 <h1 align="center">VS Code - Package Manager Detector</h1>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=nitayneeman.package-manager-detector"><img src="https://vsmarketplacebadges.dev/version/nitayneeman.package-manager-detector.svg?label=Package%20Manager%20Detector&color=eae9e1" alt="Marketplace"></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=nitayneeman.package-manager-detector"><img src="https://vsmarketplacebadges.dev/installs/nitayneeman.package-manager-detector.svg?color=blue" alt="Installs"></a>
-  <a href="https://github.com/nitayneeman/vscode-package-manager-detector/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-lightgray.svg" alt="License"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=nitayneeman.package-manager-detector"><img src="https://img.shields.io/visual-studio-marketplace/v/nitayneeman.package-manager-detector?label=Package%20Manager%20Detector&color=eae9e1" alt="Marketplace"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=nitayneeman.package-manager-detector"><img src="https://img.shields.io/visual-studio-marketplace/i/nitayneeman.package-manager-detector?color=1E7FC0" alt="Installs"></a>
+  <a href="https://github.com/nitayneeman/vscode-package-manager-detector/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-lightgray" alt="License"></a>
 </p>
 
 <p align="center">
