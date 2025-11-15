@@ -2,7 +2,7 @@
   "name": "package-manager-detector",
   "displayName": "Package Manager Detector",
   "description": "🔎 A Visual Studio Code extension which detects and displays which package manager (npm, yarn, pnpm or bun) is used in your project",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "publisher": "nitayneeman",
   "repository": {
     "type": "git",
@@ -28,6 +28,13 @@
   ],
   "activationEvents": [
     "onStartupFinished"
+  ],
+  "badges": [
+    {
+      "description": "Build",
+      "url": "https://img.shields.io/github/actions/workflow/status/nitayneeman/vscode-package-manager-detector/sanity.yml",
+      "href": "https://github.com/nitayneeman/vscode-package-manager-detector/actions/workflows/sanity.yml"
+    }
   ],
   "main": "./out/extension.js",
   "contributes": {
