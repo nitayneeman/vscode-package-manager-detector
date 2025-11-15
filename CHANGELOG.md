@@ -2,6 +2,27 @@
 
 All notable changes to the "Package Manager Detector" extension will be documented in this file.
 
+## [1.0.0] - 2025-11-14
+
+### 🎉 Official Release
+
+This marks the official 1.0.0 release of Package Manager Detector! The extension is now stable and production-ready.
+
+#### ✨ Highlights
+- **Stable API**: All core features are finalized and tested
+- **Monorepo Support**: Intelligent detection for multi-package projects
+- **Clean UI**: Streamlined status bar and tooltip design
+- **Performance**: Fast, lightweight, and reliable detection
+- **Documentation**: Complete README with usage examples and settings
+
+#### 🎯 Core Features
+- Automatic package manager detection (npm, yarn, pnpm, bun)
+- Color-coded status bar indicators
+- Interactive tooltip with package manager info and scripts
+- Monorepo-aware context detection
+- Real-time updates via file watchers
+- Customizable colors for each package manager
+
 ## [0.5.0] - 2025-01-11
 
 ### 🎯 Monorepo Support & UI Refinements

@@ -2,7 +2,7 @@
   "name": "package-manager-detector",
   "displayName": "Package Manager Detector",
   "description": "🔎 A Visual Studio Code extension which detects and displays which package manager (npm, yarn, pnpm or bun) is used in your project",
-  "version": "0.4.4",
+  "version": "1.0.0",
   "publisher": "nitayneeman",
   "repository": {
     "type": "git",
