@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/nitayneeman/vscode-package-manager-detector/blob/main/images/logo.png?raw=true" width="300" alt="Logo">
+</p>
+
 <h1 align="center">VS Code - Package Manager Detector</h1>
 
 <p align="center">
